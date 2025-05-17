@@ -1,0 +1,39 @@
+<!-- tutor-content.html -->
+<div class="chat-page">
+  <div class="chat-wrapper">
+
+    <!-- Área principal de conversación -->
+    <div class="chat-container">
+      <h2 class="tutor-title">
+        <span class="tutor-icon">🧠</span>
+        <span class="tutor-text">Tutor IA</span>
+      </h2>
+
+      <div id="chat"></div>
+
+      <form id="formularioChat">
+        <textarea
+          id="inputMensaje"
+          placeholder="Escribe tu duda aquí..."
+          rows="1"
+          required
+        ></textarea>
+        <button type="submit">Enviar</button>
+        <button type="button" onclick="limpiarChat()">🗑</button>
+      </form>
+    </div>
+
+    <!-- Panel de historial simulado -->
+    <aside class="history-panel">
+      <h3>Historial de conversaciones</h3>
+      <ul class="history-list">
+        <li class="history-item"><span class="history-time">15:45</span>¿Qué es un bucle?</li>
+        <li class="history-item"><span class="history-time">15:30</span>¿Cómo se declara una variable en JavaScript?</li>
+        <li class="history-item"><span class="history-time">15:10</span>Diferencia entre <code>let</code> y <code>const</code></li>
+        <li class="history-item"><span class="history-time">14:50</span>Ejemplos de estructuras condicionales</li>
+        <li class="history-item"><span class="history-time">14:20</span>¿Qué es JSON?</li>
+      </ul>
+    </aside>
+
+  </div>
+</div>

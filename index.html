@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-uda - Login</title>
+  <link rel="icon" href="logo.png" type="image/png" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      height: 100%;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #000000, #333333);
+      color: white;
+      display: flex;
+    }
+    body.light-mode {
+      background: linear-gradient(to right, #f2f2f2, #cccccc);
+      color: #111;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: #1c1c1c;
+      width: 240px;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+      transition: transform 0.4s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    body.sidebar-hidden .sidebar {
+      transform: translateX(-100%);
+      position: absolute;
+    }
+    body.light-mode .sidebar {
+      background: #dddddd;
+      color: #111;
+    }
+
+    /* Logo y título */
+    .sidebar h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      cursor: default;
+    }
+
+    /* Navegación */
+    .nav-tabs {
+      display: flex;
+      flex-direction: column;
+      margin-top: 0;  /* arrancar a la misma altura que en estudiante.html */
+    }
+    .nav-item {
+      margin: 10px;
+      cursor: default;
+      font-weight: bold;
+      position: relative;
+      transition: background 0.3s ease;
+      padding: 8px;
+      border-radius: 5px;
+    }
+    .nav-item:hover {
+      background-color: #00aced33;
+      color: #00aced;
+    }
+    .nav-item::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 110%;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(60, 60, 60, 0.9);
+      color: white;
+      padding: 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 100;
+    }
+    .nav-item:hover::after {
+      opacity: 1;
+    }
+    body.light-mode .nav-item::after {
+      background: rgba(255, 255, 255, 0.9);
+      color: #111;
+    }
+
+    /* Botón modo claro/oscuro */
+    .toggle-mode {
+      margin-top: auto;
+      background: #00aced;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      width: 100%;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .toggle-mode:hover {
+      background: #0084b4;
+    }
+
+    /* Botón hamburguesa */
+    .hamburger {
+      position: fixed;
+      top: 20px;
+      left: 250px;
+      z-index: 999;
+      background: #444;
+      color: white;
+      font-size: 22px;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: left 0.3s ease;
+    }
+    body.sidebar-hidden .hamburger {
+      left: 10px;
+    }
+    body.light-mode .hamburger {
+      background: #ccc;
+      color: #111;
+    }
+
+    /* Contenido principal */
+    .main {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      box-sizing: border-box;
+    }
+    body.sidebar-hidden .main {
+      margin-left: 0;
+      width: 100%;
+    }
+
+    .motto {
+      font-size: 1rem;
+      margin-bottom: 15px;
+      font-style: italic;
+      opacity: 0.8;
+      text-align: center;
+    }
+
+    .login-container {
+      background: #1e1e1e;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      width: 320px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInLogin 0.8s ease-out forwards;
+    }
+    @keyframes fadeInLogin {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    body.light-mode .login-container {
+      background: #ffffff;
+      color: #111;
+    }
+    .logo-wrapper {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    .login-container img {
+      width: 60px;
+      display: block;
+    }
+    .login-container input,
+    .login-container button {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+    input[type="email"],
+    input[type="password"] {
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background: #2e2e2e;
+      color: white;
+    }
+    body.light-mode input {
+      background: #f0f0f0;
+      color: #111;
+    }
+    .login-container button {
+      background: #00aced;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .login-container button:hover {
+      background: #0084b4;
+    }
+    .register {
+      font-size: 14px;
+      color: #aaa;
+      margin-top: 10px;
+    }
+    .register a {
+      color: #ccc;
+      text-decoration: none;
+    }
+    .register a:hover {
+      text-decoration: underline;
+    }
+    .error {
+      color: #ff4f4f;
+      font-size: 14px;
+    }
+
+    /* Modal registro */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+    }
+    .close-btn {
+      margin-top: 20px;
+      background: #00aced;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .close-btn:hover {
+      background: #0084b4;
+    }
+
+    /* Footer */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 240px;
+      right: 0;
+      text-align: center;
+      font-size: 14px;
+      color: #ccc;
+      background: #1c1c1c;
+      padding: 10px;
+      transition: left 0.3s ease;
+    }
+    body.sidebar-hidden footer {
+      left: 0;
+    }
+    body.light-mode footer {
+      background: #f0f0f0;
+      color: #111;
+    }
+    footer a {
+      color: #ccc;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        position: absolute;
+        z-index: 1000;
+      }
+      .hamburger {
+        left: 10px;
+      }
+      .main {
+        margin-left: 0;
+        width: 100%;
+        padding: 20px;
+      }
+      footer {
+        left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h1>AI-uda</h1>
+    <div class="nav-tabs">
+      <div class="nav-item" data-tooltip="Interactúa con nuestro Tutor IA para resolver dudas">
+        Tutor IA
+      </div>
+      <div class="nav-item" data-tooltip="Accede a recursos y documentos en la biblioteca">
+        Biblioteca
+      </div>
+      <div class="nav-item" data-tooltip="Discusión abierta para estudiantes e invitados">
+        Foro
+      </div>
+      <div class="nav-item" data-tooltip="Visualiza y edita tu información de perfil">
+        Mi Perfil
+      </div>
+    </div>
+    <button class="toggle-mode" onclick="toggleMode()">🌗 Cambiar modo</button>
+  </div>
+
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+
+  <div class="main">
+    <div class="motto" id="motto">🔍 Explora. Aprende. Desafía tu mente.</div>
+    <div class="login-container">
+      <div class="logo-wrapper">
+        <img src="logo.png" alt="AI-uda Logo">
+      </div>
+      <h2>Iniciar sesión</h2>
+      <input type="email" id="email" placeholder="Correo electrónico">
+      <input type="password" id="password" placeholder="Contraseña">
+      <button onclick="login()">Entrar</button>
+      <p class="register">¿No tienes cuenta? <a onclick="openModal()">Regístrate</a></p>
+      <p class="error" id="error-msg"></p>
+    </div>
+  </div>
+
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <h3>Registro no disponible aún</h3>
+      <p>Esta función estará activa próximamente.</p>
+      <button class="close-btn" onclick="closeModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 AI-uda. Todos los derechos reservados. |
+    <a href="#">Contacto</a> |
+    <a href="#">Política de privacidad</a>
+  </footer>
+
+  <script>
+    const mottos = [
+      "🔍 Explora. Aprende. Desafía tu mente.",
+      "✨ La curiosidad te hace brillante.",
+      "❓ Cada pregunta cuenta.",
+      "🚀 Empieza hoy, supera mañana."
+    ];
+    let mottoIndex = 0;
+    setInterval(() => {
+      mottoIndex = (mottoIndex + 1) % mottos.length;
+      document.getElementById("motto").textContent = mottos[mottoIndex];
+    }, 4000);
+
+    function toggleMode() {
+      const isLight = document.body.classList.toggle("light-mode");
+      localStorage.setItem("modo", isLight ? "claro" : "oscuro");
+    }
+    function toggleSidebar() {
+      document.body.classList.toggle("sidebar-hidden");
+    }
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const errorMsg = document.getElementById("error-msg");
+      const btn = document.querySelector(".login-container button");
+      errorMsg.textContent = "";
+      btn.disabled = true;
+      btn.textContent = "Cargando...";
+      setTimeout(() => {
+        if (email === "estudiante@prueba.com" && password === "estudiante") {
+          window.location.href = "estudiante.html";
+        } else if (email === "profesor@prueba.com" && password === "profesor") {
+          window.location.href = "profesor.html";
+        } else {
+          errorMsg.textContent = "Correo o contraseña incorrectos.";
+          btn.textContent = "Entrar";
+          btn.disabled = false;
+        }
+      }, 1500);
+    }
+    function openModal() {
+      document.getElementById("registerModal").style.display = "flex";
+    }
+    function closeModal() {
+      document.getElementById("registerModal").style.display = "none";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("modo") === "claro") {
+        document.body.classList.add("light-mode");
+      }
+      ["email","password"].forEach(id =>
+        document.getElementById(id).addEventListener("keypress", e => {
+          if (e.key === "Enter") login();
+        })
+      );
+    });
+  </script>
+</body>
+</html>

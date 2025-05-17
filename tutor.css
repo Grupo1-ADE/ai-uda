@@ -1,0 +1,199 @@
+/* tutor.css */
+
+/* ======================
+   Variables globales de tema
+   ====================== */
+   :root {
+    /* Modo oscuro (por defecto) */
+    --chat-bg: #1e1e1e;
+    --chat-color: #fff;
+    --input-bg: #2a2a2a;
+    --input-color: #fff;
+    --accent: #00aced;
+    --toast-bg: rgba(0,0,0,0.8);
+    --skeleton-base: #2a2a2a;
+    --skeleton-highlight: #3a3a3a;
+  }
+  /* Modo claro */
+  body.light-mode {
+    --chat-bg: #ffffff;
+    --chat-color: #111111;
+    --input-bg: #f0f0f0;
+    --input-color: #111111;
+    --accent: #00aced;
+    --toast-bg: rgba(255,255,255,0.8);
+    --skeleton-base: #e0e0e0;
+    --skeleton-highlight: #f0f0f0;
+  }
+  
+  
+  /* ======================
+     Burbujas de chat
+     ====================== */
+  /* Burbujas de respuesta del bot */
+  .bot-bubble {
+    background: var(--input-bg);
+    color: var(--chat-color);
+    align-self: flex-start;
+    padding: 12px 15px;
+    border-radius: 10px;
+    max-width: 80%;
+    transition: background 0.3s, color 0.3s;
+  }
+  /* Burbujas del usuario */
+  .user-bubble {
+    background: #0084ff;
+    color: #fff;
+    align-self: flex-end;
+    padding: 12px 15px;
+    border-radius: 10px;
+    max-width: 80%;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  /* Burbujas “pensando” */
+  .bot-thinking {
+    background: var(--input-bg);
+    color: var(--input-color);
+    align-self: flex-start;
+    padding: 12px 15px;
+    border-radius: 10px;
+    max-width: 80%;
+    font-size: 16px;
+    line-height: 1.5;
+    transition: background 0.3s, color 0.3s;
+  }
+  
+  
+  /* ======================
+     Título “Tutor IA”
+     ====================== */
+  .tutor-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 2rem;
+  }
+  .tutor-icon {
+    font-size: 2rem; /* Emoji conserva color nativo */
+  }
+  .tutor-text {
+    background: linear-gradient(to right, #00aced, #0079bf);
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  
+  
+  /* ======================
+     Layout general
+     ====================== */
+  .chat-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .chat-wrapper {
+    display: flex;
+    flex: 1;
+    gap: 20px;
+  }
+  
+  
+  /* ======================
+     Chat principal
+     ====================== */
+  .chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  #chat {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--chat-bg);
+    color: var(--chat-color);
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: background 0.3s, color 0.3s;
+  }
+  #formularioChat {
+    display: flex;
+    gap: 10px;
+  }
+  #inputMensaje {
+    flex: 1;
+    resize: none;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--input-bg);
+    color: var(--input-color);
+    font-size: 15px;
+    transition: background 0.3s, color 0.3s;
+  }
+  #formularioChat button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #formularioChat button[type="submit"] {
+    background: var(--accent);
+    color: white;
+  }
+  #formularioChat button[type="button"] {
+    background: #e74c3c;
+    color: white;
+  }
+  
+  
+  /* ======================
+     Panel de historial
+     ====================== */
+  .history-panel {
+    flex: 0 0 260px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--chat-bg);
+    color: var(--chat-color);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  }
+  .history-panel h3 {
+    margin: 0 0 12px;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+  .history-list {
+    flex: 1;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+  }
+  .history-item {
+    background: var(--input-bg);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    cursor: default;
+    transition: background 0.2s;
+  }
+  .history-item:hover {
+    background: var(--chat-bg);
+  }
+  .history-time {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 4px;
+  }
+  

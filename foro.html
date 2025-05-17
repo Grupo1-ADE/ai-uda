@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI-uda – Foro</title>
+  <style>
+    /* Scope all forum styles under .foro-app */
+    .foro-app {
+      --chat-bg: #1e1e1e;
+      --color-chat: #fff;
+      --input-bg: #2a2a2a;
+      --color-input: #fff;
+      --accent: #00aced;
+      --toast-bg: rgba(0,0,0,0.8);
+      --skeleton-base: #2a2a2a;
+      --skeleton-highlight: #3a3a3a;
+    }
+    /* Cuando el <body> tenga .light-mode, redefinimos para modo claro */
+    body.light-mode .foro-app {
+      --chat-bg: #fff;
+      --color-chat: #111;
+      --input-bg: #f0f0f0;
+      --color-input: #111;
+      --accent: #00aced;
+      --toast-bg: rgba(255,255,255,0.8);
+      --skeleton-base: #e0e0e0;
+      --skeleton-highlight: #f0f0f0;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200px 0; }
+      100% { background-position: 200px 0; }
+    }
+
+    /* ===== TÍTULO AL ESTILO BIBLIOTECA ===== */
+    .foro-app .foro-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      font-size: 2.5rem;
+      color: var(--color-chat);
+    }
+    .foro-app .foro-icon {
+      font-size: 2.5rem;
+    }
+    .foro-app .foro-text {
+      background: linear-gradient(to right,#00aced,#0079bf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+    /* ======================================== */
+
+    .foro-app * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    .foro-app .foro-container {
+      display: flex;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    .foro-app .main-panel {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .foro-app .side-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .foro-app .skeleton {
+      background: var(--skeleton-base);
+      background-image: linear-gradient(
+        90deg,
+        var(--skeleton-base) 0%,
+        var(--skeleton-highlight) 50%,
+        var(--skeleton-base) 100%
+      );
+      background-size: 400px 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 4px;
+    }
+
+    .foro-app .search-filters {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .foro-app .search-filters input,
+    .foro-app .search-filters select {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: var(--input-bg);
+      color: var(--color-input);
+      font-size: 1rem;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+    }
+
+    .foro-app #btnToggleNew {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-weight: bold;
+      align-self: flex-start;
+    }
+
+    .foro-app .new-thread {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--input-bg);
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .foro-app .new-thread input,
+    .foro-app .new-thread textarea {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: var(--chat-bg);
+      color: var(--color-chat);
+      font-size: 1rem;
+      resize: vertical;
+    }
+
+    .foro-app .new-thread button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .foro-app .threads {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .foro-app .threads li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      background: var(--input-bg);
+      border-radius: 8px;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .foro-app .threads li:hover {
+      background: var(--chat-bg);
+    }
+
+    .foro-app .threads li.unread::before {
+      content: '●';
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent);
+    }
+
+    .foro-app .thread-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .foro-app .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .foro-app .thread-text {
+      flex: 1;
+      margin-left: 10px;
+    }
+
+    .foro-app .thread-title {
+      font-weight: bold;
+    }
+
+    .foro-app .thread-meta {
+      color: #aaa;
+      font-size: .85rem;
+    }
+
+    .foro-app .thread-actions button {
+      background: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 4px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: .9rem;
+    }
+
+    .foro-app #btnLoadMore {
+      background: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 4px;
+      padding: 8px 12px;
+      cursor: pointer;
+      margin: 10px auto 0;
+      display: block;
+    }
+
+    .foro-app .thread-messages {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--input-bg);
+      padding: 20px;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .foro-app .thread-messages.active {
+      display: flex;
+    }
+
+    .foro-app .thread-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 10px;
+    }
+
+    .foro-app .thread-header h4 {
+      margin: 0;
+      color: var(--accent);
+    }
+
+    .foro-app .thread-header .thread-meta {
+      font-size: .85rem;
+      color: #aaa;
+    }
+
+    .foro-app .message {
+      background: var(--chat-bg);
+      padding: 12px;
+      border-radius: 6px;
+    }
+
+    .foro-app .message strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--accent);
+    }
+
+    .foro-app .reactions {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .foro-app .thread-messages form {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .foro-app .thread-messages form input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      background: var(--chat-bg);
+      color: var(--color-chat);
+    }
+
+    .foro-app .thread-messages form button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .foro-app .followers,
+    .foro-app .dm-panel {
+      background: var(--input-bg);
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .foro-app .followers h3,
+    .foro-app .dm-panel h3 {
+      margin: 0 0 12px;
+      color: var(--accent);
+    }
+
+    .foro-app .followers ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .foro-app .followers li {
+      background: var(--chat-bg);  
+      padding: 8px 12px;
+      border-radius: 20px;
+      color: var(--color-chat);
+    }
+
+    .foro-app .dm-panel select,
+    .foro-app .dm-panel input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      border: none;
+      border-radius: 6px;
+      background: var(--chat-bg);
+      color: var(--color-chat);
+    }
+
+    .foro-app .dm-panel button {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .foro-app .dm-messages {
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .foro-app .dm {
+      background: var(--chat-bg);
+      padding: 8px;
+      border-radius: 6px;
+    }
+
+    .foro-app #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--toast-bg);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .foro-app #toast.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 800px) {
+      .foro-app .foro-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="foro-app">
+    <div class="foro-container">
+      <div class="main-panel">
+        <!-- Título estilo Biblioteca -->
+        <h2 class="foro-title">
+          <span class="foro-icon">💬</span>
+          <span class="foro-text">Foro</span>
+        </h2>
+
+        <div class="search-filters">
+          <input id="searchInput" type="text" placeholder="Buscar hilos…"/>
+          <select id="filterSelect">
+            <option value="all">Todos</option>
+            <option value="mine">Sólo mis hilos</option>
+          </select>
+        </div>
+        <button id="btnToggleNew">Añadir hilo</button>
+        <div class="new-thread" id="newThreadForm">
+          <h3>Crear nuevo hilo</h3>
+          <input id="threadTitle" type="text" placeholder="Título del hilo"/>
+          <textarea id="threadContent" rows="2" placeholder="Mensaje inicial"></textarea>
+          <button id="btnCreateThread">Publicar</button>
+        </div>
+        <ul id="threadsList" class="threads"></ul>
+        <button id="btnLoadMore">Cargar más</button>
+        <div id="threadMessagesContainer" class="thread-messages"></div>
+      </div>
+      <div class="side-panel">
+        <div class="followers">
+          <h3>Seguidores</h3>
+          <ul>
+            <li>@alumno1</li><li>@profesorAI</li><li>@estudiante2</li><li>@alumno2</li>
+          </ul>
+        </div>
+        <div class="dm-panel">
+          <h3>Mensajes Privados</h3>
+          <select id="dmSelect">
+            <option value="alumno1">@alumno1</option>
+            <option value="profesorAI">@profesorAI</option>
+            <option value="estudianteX">@estudiante2</option>
+            <option value="compa2">@alumno2</option>
+          </select>
+          <input id="dmInput" type="text" placeholder="Escribe un mensaje…"/>
+          <button id="btnSendDM">Enviar DM</button>
+          <div id="dmMessages" class="dm-messages"></div>
+        </div>
+      </div>
+    </div>
+    <div id="toast"></div>
+    <script src="foro.js" defer></script>
+  </div>
+</body>
+</html>

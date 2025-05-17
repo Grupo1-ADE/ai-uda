@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-uda - Estudiante</title>
+  <link rel="icon" href="img/logo.png" type="image/png" />
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; overflow-x: hidden; height: 100%; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #000000, #333333);
+      color: white;
+      display: flex;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.light-mode {
+      background: linear-gradient(to right, #f2f2f2, #cccccc);
+      color: #111;
+    }
+    nav.sidebar {
+      background: #1c1c1c;
+      width: 240px;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s ease;
+    }
+    nav.sidebar h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    body.light-mode nav.sidebar { background: #e0e0e0; color: #111; }
+    main {
+      flex-grow: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      transition: opacity 0.5s ease;
+      scroll-behavior: smooth;
+    }
+    .nav-tabs div {
+      margin: 15px 0;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 8px;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+    .nav-tabs div:hover,
+    .nav-tabs .active {
+      background-color: #00aced33;
+      color: #00aced;
+    }
+    nav.sidebar button {
+      background: #00aced;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    nav.sidebar button:hover { background: #0084b4; }
+    .hamburger {
+      position: fixed;
+      top: 20px;
+      left: 250px;
+      z-index: 999;
+      background: #444;
+      color: white;
+      font-size: 22px;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: left 0.3s ease;
+    }
+    body.sidebar-hidden .hamburger { left: 10px; }
+    body.light-mode .hamburger { background: #ccc; color: #111; }
+    body.sidebar-hidden nav.sidebar {
+      transform: translateX(-100%);
+      position: absolute;
+    }
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      nav.sidebar {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+      }
+      .nav-tabs { display: flex; gap: 10px; }
+      .nav-tabs div { font-size: 14px; padding: 6px 10px; }
+      main { padding: 15px; }
+    }
+    .cards, .article-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 15px;
+    }
+    .card, .article-card {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease, opacity 0.5s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      overflow: hidden;
+      text-align: left;
+    }
+    .card:hover, .article-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+      background-color: #2a2a2a;
+    }
+    body.light-mode .card, body.light-mode .article-card {
+      background: #ffffff;
+      color: #111;
+    }
+    body.light-mode .card:hover, body.light-mode .article-card:hover {
+      background-color: #f0f0f0;
+    }
+    .card img, .article-card img {
+      width: 100%;
+      max-height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .articles { margin-top: 20px; text-align: left; }
+    .articles h2 { margin-bottom: 15px; }
+    #article-modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    #article-modal .modal-content {
+      background: #222; color: white; padding: 30px; border-radius: 10px;
+      max-width: 700px; width: 90%; text-align: left;
+      max-height: 90vh; overflow-y: auto;
+      opacity: 0; transform: scale(0.9);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #article-modal.show .modal-content {
+      opacity: 1; transform: scale(1);
+    }
+    #article-modal .close-btn {
+      position: absolute; top: 10px; right: 10px;
+      background: transparent; border: none; font-size: 24px;
+      color: #fff; cursor: pointer;
+    }
+    #article-modal .modal-content img {
+      width: 100%; height: auto; border-radius: 10px; margin-bottom: 15px;
+    }
+  </style>
+
+  <!-- Estilos y scripts del Tutor IA -->
+  <link rel="stylesheet" href="tutor.css" />
+  <script src="tutor.js" defer></script>
+</head>
+<body>
+  <button class="hamburger" aria-label="Toggle sidebar" onclick="toggleSidebar()">☰</button>
+
+  <nav class="sidebar" aria-label="Menú de navegación">
+    <div>
+      <h1 tabindex="0" style="cursor:pointer" onclick="mostrarInicio()">AI-uda</h1>
+      <div class="nav-tabs">
+        <div onclick="cambiarSeccion('tutor')">Tutor IA</div>
+        <div onclick="cambiarSeccion('biblioteca')">Biblioteca</div>
+        <div onclick="cambiarSeccion('foro')">Foro</div>
+        <div onclick="cambiarSeccion('perfil')">Mi Perfil</div>
+      </div>
+    </div>
+    <div>
+      <button onclick="toggleMode()" aria-label="Cambiar tema">🌗 Cambiar modo</button>
+      <button onclick="logout()" aria-label="Cerrar sesión">🔒 Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <main id="contenido" role="main"></main>
+
+  <div id="article-modal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="close-btn" aria-label="Cerrar noticia" onclick="cerrarModal()">✖</button>
+      <h3 id="modal-title"></h3>
+      <img id="modal-img" src="" alt="Imagen de noticia" loading="lazy" />
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    const frasesMotivadoras = [
+      "¡Vamos! Hoy es un buen día para aprender algo nuevo 💪",
+      "Sigue así, vas por buen camino 🚀",
+      "Tu esfuerzo de hoy es tu éxito de mañana ✨"
+    ];
+    const articulosSimulados = [
+      {
+        titulo: "Tutor IA",
+        fecha: "15/05/2025",
+        autor: "Prof. Pérez",
+        contenido: "Nuestro Tutor IA utiliza redes neuronales para adaptar la enseñanza a tu ritmo y necesidades, ¡resolviendo dudas al instante con explicaciones claras! Además, ofrece explicaciones paso a paso, retroalimentación instantánea y recomendaciones personalizadas para reforzar los conceptos más desafiantes. Con análisis de tus respuestas, el sistema identifica áreas débiles y propone ejercicios adicionales.",
+        imagen: "img/tutor_ia.png"
+      },
+      {
+        titulo: "Avances en IA Educativa",
+        fecha: "12/05/2025",
+        autor: "Dr. García",
+        contenido: "La inteligencia artificial sigue revolucionando la educación mediante análisis de datos de aprendizaje y personalización de contenidos en tiempo real. Recientes investigaciones en redes profundas han permitido crear tutores virtuales capaces de explicar conceptos complejos con analogías adaptadas al estilo de aprendizaje de cada estudiante. Estos sistemas mejoran significativamente la retención y fomentan la motivación con reforzamientos positivos dinámicos.",
+        imagen: "img/avances_ia_educativa.png"
+      },
+      {
+        titulo: "Realidad Aumentada en el Aula",
+        fecha: "10/05/2025",
+        autor: "Dra. Sánchez",
+        contenido: "La realidad aumentada permite visualizar conceptos en 3D superpuestos en el entorno real, mejorando la comprensión de materias como anatomía o física. En un estudio reciente, estudiantes que usaron AR para explorar modelos anatómicos obtuvieron un 30% más de precisión en las pruebas. Estas aplicaciones incluyen interacción táctil en dispositivos móviles y lentes inteligentes, facilitando la exploración interactiva.",
+        imagen: "img/realidad_aumentada.png"
+      },
+      {
+        titulo: "Blockchain para Certificados Académicos",
+        fecha: "08/05/2025",
+        autor: "Ing. López",
+        contenido: "Instituciones educativas exploran blockchain para emitir títulos inviolables y fácilmente verificables, reduciendo el fraude y simplificando validaciones. Con esta tecnología, las credenciales se almacenan de manera descentralizada y se pueden comprobar en segundos mediante un hash público, eliminando la necesidad de intermediarios y documentos físicos certificados.",
+        imagen: "img/blockchain_certificados_academicos.png"
+      }
+    ];
+    let autoIndex = 0;
+
+    function toggleSidebar() {
+      document.body.classList.toggle("sidebar-hidden");
+    }
+    function toggleMode() {
+      const isLight = document.body.classList.toggle("light-mode");
+      localStorage.setItem("modo", isLight ? "claro" : "oscuro");
+    }
+    function logout() {
+      if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+        localStorage.clear();
+        window.location.href = "index.html";
+      }
+    }
+
+    function mostrarInicio() {
+      localStorage.removeItem("ultimaSeccion");
+      const c = document.getElementById("contenido");
+      document.querySelectorAll(".nav-tabs div").forEach(el => el.classList.remove("active"));
+      c.innerHTML = `
+        <div class="welcome">
+          <h2>Bienvenido, estudiante 👋</h2>
+        </div>
+        <p id="welcome-motto" style="margin-bottom:20px;font-style:italic;">
+          ${frasesMotivadoras[autoIndex]}
+        </p>
+        <div class="cards">
+          <div class="card" onclick="cambiarSeccion('tutor')">
+            <h3>🧠 Tutor IA</h3>
+            <p>Resuelve tus dudas al instante con ayuda del tutor inteligente.</p>
+          </div>
+          <div class="card" onclick="cambiarSeccion('biblioteca')">
+            <h3>📚 Biblioteca</h3>
+            <p>Accede a vídeos, documentos y ejercicios adaptados a tu nivel.</p>
+          </div>
+          <div class="card" onclick="cambiarSeccion('foro')">
+            <h3>💬 Foro</h3>
+            <p>Comparte ideas, colabora y aprende con otros estudiantes.</p>
+          </div>
+          <div class="card" onclick="cambiarSeccion('perfil')">
+            <h3>👤 Mi Perfil</h3>
+            <p>Consulta y edita tu información personal y progreso académico.</p>
+          </div>
+        </div>
+        <section class="articles">
+          <h2>Artículos y Noticias</h2>
+          <div class="article-cards">
+            ${articulosSimulados.map((art, i) => `
+              <article class="article-card" data-index="${i}">
+                <img src="${art.imagen}" alt="${art.titulo}" loading="lazy">
+                <h4>${art.titulo}</h4>
+                <small>${art.fecha} · ${art.autor}</small>
+                <p>${art.contenido.substring(0,100)}...</p>
+              </article>
+            `).join('')}
+          </div>
+        </section>
+      `;
+      setTimeout(() => {
+        document.querySelectorAll('.article-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const art = articulosSimulados[card.getAttribute('data-index')];
+            const m = document.getElementById('article-modal');
+            document.getElementById('modal-title').textContent = art.titulo;
+            document.getElementById('modal-img').src = art.imagen;
+            document.getElementById('modal-body').textContent = art.contenido;
+            m.classList.add('show');
+            m.style.display = 'flex';
+          });
+        });
+      }, 0);
+    }
+
+    function cerrarModal() {
+      const m = document.getElementById('article-modal');
+      m.classList.remove('show');
+      setTimeout(() => m.style.display = 'none', 300);
+    }
+
+    function cambiarSeccion(sec) {
+      const c = document.getElementById("contenido");
+      c.style.opacity = 0;
+      localStorage.setItem("ultimaSeccion", sec);
+      document.querySelectorAll(".nav-tabs div").forEach(el => el.classList.remove("active"));
+      document.querySelector(`.nav-tabs div[onclick*="${sec}"]`)?.classList.add("active");
+
+      setTimeout(() => {
+        const url = sec === 'tutor'
+          ? 'tutor-content.html'
+          : `${sec}.html`;
+
+        fetch(url)
+          .then(r => r.text())
+          .then(html => {
+            c.innerHTML = html;
+            c.style.opacity = 1;
+            window.scrollTo(0, 0);
+            if (sec === 'tutor' && typeof initTutorIA === 'function') {
+              initTutorIA();
+            }
+            if (sec === 'foro') {
+              // Cargamos dinámicamente foro.js y arrancamos initForo()
+              const s = document.createElement('script');
+              s.src = 'foro.js';
+              s.defer = true;
+              s.onload = () => {
+                if (typeof initForo === 'function') initForo();
+              };
+              document.body.appendChild(s);
+            }
+          })
+          .catch(() => {
+            c.innerHTML = "<p>Error al cargar la sección.</p>";
+            c.style.opacity = 1;
+          });
+      }, 200);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("modo") === "claro") {
+        document.body.classList.add("light-mode");
+      }
+      const u = localStorage.getItem("ultimaSeccion");
+      if (u) {
+        cambiarSeccion(u);
+      } else {
+        mostrarInicio();
+      }
+      setInterval(() => {
+        autoIndex = (autoIndex + 1) % frasesMotivadoras.length;
+        const mm = document.getElementById("welcome-motto");
+        if (mm) mm.textContent = frasesMotivadoras[autoIndex];
+      }, 5000);
+    });
+  </script>
+</body>
+</html>
